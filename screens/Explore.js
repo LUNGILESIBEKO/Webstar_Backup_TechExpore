@@ -35,8 +35,6 @@ const SKILLS = [
   { name: "SQL & Data Analysis", badge: "Steady", category: "Data / Analytics", pct: 75 },
 ];
 
-// Each cert now carries a real `url` to the official provider page, used by
-// the "Get Certified" button below to open the actual sign-up/exam page.
 const CERTS = [
   {
     name: "AWS Certified Solutions Architect – Associate",
