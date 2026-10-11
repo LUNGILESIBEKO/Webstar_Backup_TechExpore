@@ -1,0 +1,65 @@
+const Roadmapdata = {
+  overallProgress: 29,
+  milestonesCompleted: 2,
+  milestonesTotal: 7,
+  steps: [
+    {
+      id: 1,
+      category: "Foundations",
+      title: "Learn Python & Git basics",
+      duration: "3 weeks",
+      description: "Core syntax, data structures, and version control fundamentals.",
+      status: "completed",
+    },
+    {
+      id: 2,
+      category: "Foundations",
+      title: "SQL & relational databases",
+      duration: "2 weeks",
+      description: "Schema design, joins, indexing, and query optimisation basics.",
+      status: "completed",
+    },
+    {
+      id: 3,
+      category: "Core Skills",
+      title: "Build a REST API",
+      duration: "4 weeks",
+      description: "Design and ship a production-style API with authentication and tests.",
+      status: "current",
+    },
+    {
+      id: 4,
+      category: "Core Skills",
+      title: "Containers with Docker",
+      duration: "2 weeks",
+      description: "Package your API into a container and run it consistently anywhere.",
+      status: "pending",
+    },
+    {
+      id: 5,
+      category: "Advanced",
+      title: "CI/CD pipelines",
+      duration: "2 weeks",
+      description: "Automate testing and deployment with GitHub Actions.",
+      status: "pending",
+    },
+    {
+      id: 6,
+      category: "Advanced",
+      title: "Cloud deployment (AWS/Azure)",
+      duration: "3 weeks",
+      description: "Deploy and scale your API on a major cloud provider.",
+      status: "pending",
+    },
+    {
+      id: 7,
+      category: "Job Ready",
+      title: "Build a portfolio project",
+      duration: "4 weeks",
+      description: "Combine everything into a polished project for your CV and interviews.",
+      status: "pending",
+    },
+  ],
+};
+
+export default Roadmapdata;
