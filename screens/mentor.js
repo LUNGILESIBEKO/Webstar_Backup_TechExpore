@@ -149,8 +149,35 @@ export default function MentorshipScreen({ navigate }) {
       return next;
     });
     if (!uid) return true; // not signed in: only lasts for this session
-    // ...then save to this student's own document.
     try {
+      // 1) The request document the mentor portal reads
+      const reqRef = doc(db, "mentorRequests", `${uid}_${mentor.id}`);
+      if (add) {
+        if (!mentor.id) throw new Error("This mentor has no id");
+        const me = (await getDoc(doc(db, "users", uid))).data() || {};
+        await setDoc(reqRef, {
+          studentId: uid,
+          studentName: me.fullName || "Student",
+          studentEmail: auth.currentUser?.email || me.email || "",
+          course: me.course || "",
+          institution: me.institution || "",
+          year: me.year || "",
+          careerMatch: quizResult?.topMatch?.title || null,
+          mentorId: mentor.id,
+          mentorName: mentor.name,
+          status: "pending",
+          requestedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        // Old requests (sent before this change) have no document: that's fine, skip it.
+        try {
+          await setDoc(reqRef, { status: "withdrawn", updatedAt: serverTimestamp() }, { merge: true });
+        } catch (e) {
+          console.log("No request document to withdraw (old request):", e.code);
+        }
+      }
+      // 2) Your existing save on the student's own document
       await setDoc(
         doc(db, "users", uid),
         {

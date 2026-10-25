@@ -28,15 +28,11 @@ import MentorshipScreen from "./screens/mentor";
 const Stack = createNativeStackNavigator();
 const navigationRef = createNavigationContainerRef();
 
-// ---- Session timeout ----
-// If a signed-in student does nothing (no taps, no scrolling) for this long,
-// they are signed out and sent back to the Login screen.
-const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+const SESSION_TIMEOUT_MS = 15 * 60 * 1000; 
 const LAST_ACTIVE_KEY = "lastActiveAt";
 
-// Maps the lowercase route keys the older screens call internally
-// (e.g. navigate("settings")) to the PascalCase route names registered
-// below (e.g. "Settings"), so both naming styles can coexist.
+
 const ROUTE_MAP = {
   profile: "Profile",
   settings: "Settings",
@@ -47,8 +43,7 @@ const ROUTE_MAP = {
   login: "Login",
   home: "Home",
 };
-// The four tabs (Home / Explore / Roadmap / Profile) live inside the "Main"
-// screen, so they are opened with navigate("Main", { tab }).
+
 const TAB_NAMES = ["Home", "Explore", "Roadmap", "Profile"];
 const mapRoute = (key) => ROUTE_MAP[key] || key;
 const go = (navigation, name, params) =>
@@ -64,13 +59,7 @@ function LoginScreenAdapter({ navigation }) {
   );
 }
 
-// Old screens' "back" buttons call navigate("profile") unconditionally.
-// That's correct when they were pushed on top of Profile, but Mentor (and
-// potentially others) can now be reached from Home too — pushing a new
-// Profile screen instead of actually going back would leave stale screens
-// stacked behind the user. This prefers a real goBack() when there's
-// somewhere to go back to, and only falls back to a fresh Profile push
-// when there isn't (e.g. deep-linking straight into the screen).
+
 function goBackOrToProfile(navigation) {
   if (navigation.canGoBack()) {
     navigation.goBack();
@@ -103,8 +92,7 @@ function MentorshipScreenAdapter({ navigation }) {
   );
 }
 
-// Shown for a moment at startup while we check whether the student is still
-// signed in from last time.
+
 function Splash() {
   const { dark } = useTheme();
   return (
@@ -149,20 +137,20 @@ function RootStack({ initialRoute }) {
 }
 
 export default function App() {
-  // Runs once at startup: look in the console for ✅ or ❌
+ 
   React.useEffect(() => { checkFirestoreConnection(); }, []);
 
-  // ---- Session timeout: log out after a period of no activity ----
+  
   const lastActive = React.useRef(Date.now());
 
   const markActive = React.useCallback(() => {
     const now = Date.now();
-    // Only write to storage at most once every 10 seconds
+   
     if (now - lastActive.current > 10000) {
       AsyncStorage.setItem(LAST_ACTIVE_KEY, String(now)).catch(() => {});
     }
     lastActive.current = now;
-    return false; // never block the touch - the screen underneath still gets it
+    return false; 
   }, []);
 
   const expireSessionIfIdle = React.useCallback(async () => {

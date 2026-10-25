@@ -14,9 +14,7 @@ import {
 import { useCardTheme, BRAND, PALETTE } from '../theme';
 import { Screen, ScreenHeader, GlassCard, ProgressBar, EmptyState } from '../components/UI';
 
-// The roadmap is BUILT from the student's quiz result: whichever career track
-// the quiz ranks first decides which steps appear here. Retake the quiz and a
-// new roadmap appears. Progress is saved per step on users/{uid}.
+
 export default function Roadmap({ navigation }) {
   const t = useCardTheme();
   const uid = auth.currentUser?.uid;
@@ -29,7 +27,6 @@ export default function Roadmap({ navigation }) {
 
   const templateSteps = useRoadmapSteps(trackId);
 
-  // Step ids this student has ticked off (stored as strings like "backend-developer-1").
   const [completedIds, setCompletedIds] = useState([]);
   useEffect(() => {
     setCompletedIds((profile?.completedRoadmapSteps || []).map(String));
@@ -43,9 +40,9 @@ export default function Roadmap({ navigation }) {
 
   const [expandedStepId, setExpandedStepId] = useState(null);
   useEffect(() => {
-    // Open the "You are here" step by default.
+    
     setExpandedStepId(currentStep ? currentStep.id : null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+ 
   }, [trackId, templateSteps.length]);
 
   // Tap a step's circle to toggle it done / not done.
