@@ -34,11 +34,17 @@ export function useCareerTracks() {
     () =>
       rows.map((t, i) => {
         const title = typeof t === "string" ? t : t.title;
-        // Keep the track's own id when it has one. Rebuilding it from the title
-        // turned "QA / Test Engineer" into "qa-test-engineer", which no longer
-        // matched the quiz weights and roadmap steps ("qa-engineer"), so that
-        // career could never win the quiz.
-        const id = typeof t === "string" ? slugify(title) : t.id || slugify(title);
+        // The quiz weights and roadmap steps use ids like "backend-developer".
+        // Firestore's career_tracks documents are saved as { title, order } only,
+        // so the id the app receives from them is the DOCUMENT name ("track_1"),
+        // which matches nothing: every score became 0, Backend always "won" and
+        // no roadmap was found. So the id is looked up from the built-in list
+        // (by its own id, then by title) and the document name is never used.
+        const known =
+          (typeof t === "object" && TRACKS.find((b) => b.id === t.id)) ||
+          TRACKS.find((b) => b.title === title) ||
+          TRACKS.find((b) => slugify(b.title) === slugify(title));
+        const id = known ? known.id : slugify(title);
         return { id, title, order: t.order ?? i + 1 };
       }),
     [rows]
@@ -111,7 +117,10 @@ export function scoreQuiz(questions, answers, tracks) {
 export function trackIdFromResult(quizResult) {
   const top = quizResult?.topMatch;
   if (!top) return null;
-  return top.id || slugify(top.title);
+  const byId = TRACKS.find((t) => t.id === top.id);
+  const byTitle = TRACKS.find((t) => t.title === top.title);
+  const raw = byId?.id || byTitle?.id || top.id || slugify(top.title);
+  return TRACK_ALIASES[raw] || raw;
 }
 
 // The student's career track, from their saved quiz result. Explore (skills,
