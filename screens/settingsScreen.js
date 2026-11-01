@@ -51,10 +51,10 @@ const SA_INSTITUTIONS_FALLBACK = [
   "Other",
 ];
 
-const PRIVACY = `Last updated: 1 September 2025
+const PRIVACY = `Last updated: 1 September 2026
 
 1. Information We Collect
-We collect information you provide directly — name, email address, institution, and quiz responses. We also collect usage data such as screens visited and features used to improve the app experience.
+We collect information you provide directly name, email address, institution, and quiz responses. We also collect usage data such as screens visited and features used to improve the app experience.
 
 2. How We Use Your Information
 Your data is used solely to personalise your career recommendations, roadmap progress, and mentor matching. We do not sell your personal information to third parties.
@@ -71,7 +71,7 @@ You have the right to access, correct, or delete your personal data at any time.
 6. Changes to This Policy
 We may update this policy periodically. Significant changes will be communicated via in-app notification.`;
 
-const TERMS = `Last updated: 1 September 2025
+const TERMS = `Last updated: 1 September 2026
 
 1. Acceptance of Terms
 By using Tech Career Explorer, you agree to these Terms of Service. If you do not agree, please do not use the app.
@@ -86,7 +86,7 @@ You are responsible for maintaining the confidentiality of your login credential
 Career match results, salary data, and roadmap content are provided for informational purposes only. They are based on publicly available market data and should not be considered professional career counselling advice.
 
 5. Intellectual Property
-All content within the app — including career data, roadmap content, and design — is the property of Tech Career Explorer. You may not reproduce or distribute it without permission.
+All content within the app including career data, roadmap content, and design is the property of Tech Career Explorer. You may not reproduce or distribute it without permission.
 
 6. Termination
 We reserve the right to suspend or terminate accounts that violate these terms or engage in fraudulent or harmful behaviour.
@@ -339,14 +339,7 @@ export default function SettingsScreen({ navigate, onLogout }) {
     }, 1200);
   };
 
-  // This is the fix: previously this only validated the new password
-  // locally and then saved unrelated profile fields to Firestore - the
-  // actual Firebase Authentication password was never touched, so the
-  // old password kept working forever. Now it reauthenticates with the
-  // current password (Firebase requires a recent sign-in for this) and
-  // then calls updatePassword, which is the call that actually replaces
-  // the credential - after this resolves, the old password no longer
-  // works for sign-in.
+
   const handlePasswordSave = async () => {
     setPwError("");
 

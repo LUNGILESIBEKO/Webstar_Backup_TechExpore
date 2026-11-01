@@ -9,6 +9,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { signOut } from "firebase/auth";
 import { auth } from "./Firebase";
 import { checkFirestoreConnection } from "./checkFirestore";
+import { withTimeout } from "./offlineCache";
 
 import { ThemeProvider, useTheme } from "./ThemeContext";
 import { gradientFor } from "./theme";
@@ -138,7 +139,7 @@ function RootStack({ initialRoute }) {
 
 export default function App() {
  
-  React.useEffect(() => { checkFirestoreConnection(); }, []);
+   React.useEffect(() => { if (__DEV__) checkFirestoreConnection(); }, []);
 
   
   const lastActive = React.useRef(Date.now());
@@ -188,14 +189,26 @@ export default function App() {
         let user = auth.currentUser;
         if (user) {
           const idle = Date.now() - lastActive.current >= SESSION_TIMEOUT_MS;
+          let online = true;
           try {
-            await user.reload(); // may fail offline - then use what we have saved
-            await auth.currentUser?.getIdToken(true);
-          } catch (e) {}
+            // Give up after 4 seconds so the app doesn't sit on the loading screen offline
+            await withTimeout(
+              (async () => {
+                await user.reload();
+                await auth.currentUser?.getIdToken(true);
+              })(),
+              4000
+            );
+          } catch (e) {
+            online = !(e.message === "timeout" || e.code === "auth/network-request-failed");
+          }
           user = auth.currentUser;
-          if (idle || !user?.emailVerified) {
+          if (!user) {
+            // nothing to restore: stay on Login
+          } else if ((online && idle) || !user.emailVerified) {
             await signOut(auth);
           } else {
+            // Offline we can't sign in again, so the saved login is kept until the phone is online
             route = "Main";
             lastActive.current = Date.now();
           }

@@ -18,6 +18,7 @@ import { db, auth } from "./Firebase";
 import { useFirestoreList, byOrder } from "./FirestoreHooks";
 import { TRACKS, QUIZ_QUESTIONS, ROADMAP_STEPS } from "./Data/careerData";
 import { TRACK_CONTENT, TRACK_ALIASES } from "./Data/careerContent";
+import { cacheGet, cacheSet, withTimeout, flushPending } from "./offlineCache";
 
 export const slugify = (s) =>
   String(s || "")
@@ -185,11 +186,22 @@ export function useUserDoc() {
       }
       let cancelled = false;
       (async () => {
+        // Show the copy saved on this phone straight away (also what you see offline)
+        const saved = await cacheGet(`profile:${uid}`);
+        if (!cancelled && saved) {
+          setProfile(saved);
+          setLoaded(true);
+        }
         try {
-          const snap = await getDoc(doc(db, "users", uid));
-          if (!cancelled) setProfile(snap.exists() ? snap.data() : null);
+          await flushPending(uid); // send anything saved while offline
+          const snap = await withTimeout(getDoc(doc(db, "users", uid)), 6000);
+          if (!cancelled && snap.exists()) {
+            const data = snap.data();
+            setProfile(data);
+            cacheSet(`profile:${uid}`, data);
+          }
         } catch (err) {
-          console.warn("Could not load profile:", err.code, err.message);
+          console.warn("Could not load profile (using the saved copy):", err.code || err.message);
         } finally {
           if (!cancelled) setLoaded(true);
         }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
+import { saveUserPatch } from '../offlineCache';
 import { db, auth } from '../Firebase';
 import { useCareerTracks, useQuizQuestions, scoreQuiz } from '../careerEngine';
 import { useCardTheme } from '../theme';
@@ -43,15 +44,12 @@ export default function QuizScreen({ navigation }) {
     const matches = scoreQuiz(questions, answers, tracks);
     const topMatch = matches[0];
 
-    // Saved on this student's own user document; the Roadmap reads the top
-    // match from here to build their personal roadmap.
+    // Saved on the phone first, then sent to Firestore (now, or when you are back online).
     const uid = auth.currentUser?.uid;
     if (uid) {
-      setDoc(
-        doc(db, 'users', uid),
-        { quizResult: { answers, matches, topMatch, completedAt: serverTimestamp() } },
-        { merge: true }
-      ).catch((err) => console.warn('Could not save quiz result:', err.message));
+      saveUserPatch(uid, { quizResult: { answers, matches, topMatch, completedAt: Timestamp.now() } }).catch((err) =>
+        console.warn('Could not save quiz result:', err.message)
+      );
     }
 
     navigation.navigate('CareerResults', { answers, matches, topMatch });
