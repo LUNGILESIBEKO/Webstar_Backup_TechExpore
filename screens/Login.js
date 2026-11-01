@@ -412,31 +412,6 @@ export default function LoginScreen({ onLogin }) {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* This used to call onLogin() directly, which dropped the user
-                into Home with no real Firebase account (auth.currentUser
-                stayed empty). That silently broke every save in the app for
-                anyone who tapped it, since every write keys off the signed
-                in user's uid. Real Google sign-in needs its own Google
-                Cloud OAuth client + Firebase console setup, so for now this
-                just says so instead of faking a session. */}
-            <TouchableOpacity
-              onPress={() =>
-                Alert.alert(
-                  "Not set up yet",
-                  "Google sign-in isn't connected yet. Please use email and password for now."
-                )
-              }
-              style={styles.googleButton}
-            >
-              <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
-
             <View style={styles.switchRow}>
               <Text style={styles.switchText}>
                 {isSignup ? "Already have an account? " : "Don't have an account? "}
@@ -637,20 +612,6 @@ const styles = StyleSheet.create({
   primaryButtonText: { fontSize: 17, fontWeight: "800" },
   primaryButtonTextActive: { color: BRAND.deep },
   primaryButtonTextDisabled: { color: PALETTE.white },
-  dividerRow: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 16 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.2)" },
-  dividerText: { fontSize: 12, color: PALETTE.white },
-  googleButton: {
-    width: "100%",
-    paddingVertical: 15,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: "rgba(77,212,206,0.5)",
-    backgroundColor: "rgba(77,212,206,0.10)",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  googleButtonText: { color: PALETTE.white, fontSize: 15, fontWeight: "600" },
   switchRow: { flexDirection: "row", justifyContent: "center", flexWrap: "wrap" },
   switchText: { fontSize: 14, color: PALETTE.white },
   switchLink: { fontSize: 14, fontWeight: "700", color: PALETTE.white },

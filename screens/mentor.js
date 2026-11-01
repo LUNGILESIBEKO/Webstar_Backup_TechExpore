@@ -134,7 +134,7 @@ export default function MentorshipScreen({ navigate }) {
     toast.show({
       type: "info",
       title: free === 1 ? "1 mentor available now" : `${free} mentors available now`,
-      message: free > 0 ? "Pick one and send a request." : "We'll alert you when someone is free.",
+      message: "Pick any mentor and send a request.",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefsLoaded, mentorsReady]);
@@ -201,17 +201,6 @@ export default function MentorshipScreen({ navigate }) {
   };
 
   const onPressRequest = async (mentor) => {
-    if (!mentor.available) {
-      toast.show({
-        type: "info",
-        title: `${mentor.name} is busy right now`,
-        message: alertsOn
-          ? "We'll pop up a notification as soon as they're available."
-          : "Turn on Mentor Availability Alerts in Settings to be told when they're free.",
-      });
-      return;
-    }
-
     if (requested.has(mentor.name)) {
       setConfirmMentor(mentor); // ask before withdrawing
       return;
@@ -239,8 +228,9 @@ export default function MentorshipScreen({ navigate }) {
 
   const availableCount = mentors.filter((m) => m.available).length;
 
-  // Mentors who fit the student's career come first (the sort keeps the original
-  // order inside each group).
+  // ALL mentors are always shown. Mentors who fit the student's career are only
+  // moved to the top (and tagged); nobody is hidden and no "no mentor for your
+  // career" message is shown. The student chooses whichever mentor they want.
   const track = useMemo(() => myTrackFrom(quizResult), [quizResult]);
   const orderedMentors = useMemo(() => {
     if (!track) return mentors.map((m) => ({ m, match: false }));
@@ -257,19 +247,12 @@ export default function MentorshipScreen({ navigate }) {
         title="Find a Mentor"
         subtitle={
           track && matchCount > 0
-            ? `${matchCount} match your career · ${availableCount} available now`
-            : `${availableCount} mentors available now`
+            ? `${mentors.length} mentors · ${matchCount} match your career`
+            : `${mentors.length} mentors to choose from`
         }
       />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {track && matchCount === 0 && (
-          <GlassCard style={{ marginBottom: 12 }}>
-            <Text style={[styles.bio, { color: t.subtext, marginTop: 0 }]}>
-              We don't have a {track.title} mentor yet, so you're seeing everyone. More mentors are being added.
-            </Text>
-          </GlassCard>
-        )}
         {orderedMentors.map(({ m: mentor, match }) => {
           const isReq = requested.has(mentor.name);
           return (
@@ -288,7 +271,7 @@ export default function MentorshipScreen({ navigate }) {
                   <Text style={[styles.locationText, { color: t.subtext }]}>{mentor.location}</Text>
                 </View>
 
-                <Pill label={mentor.available ? "Available" : "Busy"} tone={mentor.available ? "green" : "muted"} />
+                {mentor.available && <Pill label="Available" tone="green" />}
               </View>
 
               {match && (
@@ -312,17 +295,15 @@ export default function MentorshipScreen({ navigate }) {
                   styles.requestButton,
                   { backgroundColor: BRAND.dark },
                   isReq && { backgroundColor: "transparent", borderWidth: 2, borderColor: t.accent },
-                  !mentor.available && { backgroundColor: t.track },
                 ]}
               >
                 <Text
                   style={[
                     styles.requestButtonText,
                     isReq && { color: t.accent },
-                    !mentor.available && { color: t.subtext },
                   ]}
                 >
-                  {isReq ? "Request Sent" : mentor.available ? "Request Mentorship" : "Currently Unavailable"}
+                  {isReq ? "Request Sent" : "Request Mentorship"}
                 </Text>
               </TouchableOpacity>
             </GlassCard>
