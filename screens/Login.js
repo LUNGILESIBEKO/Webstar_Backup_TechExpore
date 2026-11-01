@@ -372,7 +372,7 @@ export default function LoginScreen({ onLogin }) {
               {!!showPasswordError && <Text style={styles.errorText}>{passwordError}</Text>}
               {!showPasswordError && (
                 <Text style={styles.hintText}>
-                  At least {MIN_PASSWORD_LENGTH} characters, with a number and a symbol
+                  
                 </Text>
               )}
             </View>
@@ -473,8 +473,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: "rgba(255,255,255,0.25)",
     paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 24,
+    paddingTop: 80,
+    paddingBottom: 80,
     overflow: "hidden",
     shadowColor: PALETTE.black,
     shadowOpacity: 0.2,
